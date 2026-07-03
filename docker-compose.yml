@@ -1,0 +1,55 @@
+services:
+
+  mysql:
+    image: mysql:8.0
+    container_name: pdm_mysql
+    restart: unless-stopped
+
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: predictive_maintenance
+
+    ports:
+      - "3306:3306"
+
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: pdm_mosquitto
+    restart: unless-stopped
+
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+
+    volumes:
+      - ./mosquitto/config:/mosquitto/config
+      - ./mosquitto/data:/mosquitto/data
+      - ./mosquitto/log:/mosquitto/log
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+
+    container_name: pdm_backend
+
+    restart: unless-stopped
+
+    depends_on:
+      - mysql
+      - mosquitto
+
+    env_file:
+      - ./backend/.env.docker
+
+    environment:
+      ENV_FILE: .env.docker
+
+    ports:
+      - "8000:8000"
+
+volumes:
+  mysql_data:
