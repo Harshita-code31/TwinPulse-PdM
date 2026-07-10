@@ -2,193 +2,290 @@
 
 ## Overview
 
-The Predictive Maintenance System is designed to simulate industrial machines, collect telemetry using MQTT, store sensor readings in MySQL, perform machine learning predictions using TensorFlow, and expose the results through FastAPI.
+PredictivePulse is an end-to-end Industrial AI Predictive Maintenance Platform that combines Digital Twin simulation, MQTT messaging, TensorFlow-based machine learning, FastAPI services, MySQL storage, Dockerized deployment, and a Flutter mobile application.
+
+The platform continuously simulates industrial machines, streams telemetry through MQTT, predicts machine health in real time, stores historical sensor data, generates maintenance alerts, and visualizes the entire industrial fleet through a live mobile dashboard.
 
 ---
 
 # High Level Architecture
 
-```
-                   +-----------------------+
-                   | Digital Twin Machines |
-                   +-----------+-----------+
-                               |
-                               |
-                     MQTT Publisher
-                               |
-                               |
-                     Eclipse Mosquitto
-                               |
-                               |
-                     MQTT Subscriber
-                               |
-                               |
-                          MySQL Database
-                               |
-                               |
-                    TensorFlow Prediction
-                               |
-                               |
-                          FastAPI Backend
-                               |
-               +---------------+---------------+
-               |                               |
-        Angular Dashboard              Flutter App
+```text
+                     +-----------------------------+
+                     |   Digital Twin Simulator    |
+                     +-------------+---------------+
+                                   |
+                                   |
+                           MQTT Publisher
+                                   |
+                                   |
+                     Eclipse Mosquitto MQTT Broker
+                                   |
+             +---------------------+----------------------+
+             |                                            |
+             |                                            |
+             ▼                                            ▼
+      MQTT Subscriber                           Flutter Mobile App
+             |                                  (Live MQTT Client)
+             |                                            ▲
+             ▼                                            │
+      MySQL Database                                      │
+             |                                            │
+             ▼                                            │
+ TensorFlow Prediction Engine                             │
+             |                                            │
+             ▼                                            │
+        FastAPI Backend ──────────────────────────────────┘
+             |
+             |
+      REST API Endpoints
+             |
+      ┌──────┴────────┐
+      │               │
+      ▼               ▼
+ Machine History   Active Alerts
 ```
 
 ---
 
-# Components
+# System Components
 
-## Digital Twin
+## 1. Digital Twin Simulator
 
-Simulates multiple industrial machines by continuously generating realistic sensor readings.
+The Digital Twin Simulator models multiple industrial machines and continuously generates realistic telemetry.
+
+Each machine simulates:
+
+- Temperature
+- RPM
+- Torque
+- Vibration
+- Current
+- Oil Level
+- Operating Hours
+- Ambient Temperature
+- Operating Load
+
+The simulator also injects faults to emulate real industrial operating conditions.
 
 ---
 
-## MQTT Publisher
+## 2. MQTT Publisher
 
-Publishes sensor readings from all simulated machines to the MQTT broker.
+The MQTT Publisher collects telemetry from every Digital Twin and publishes it to the MQTT broker.
 
-Topic
+**Published Topic**
 
-```
+```text
 machines/sensors
 ```
 
+Responsibilities:
+
+- Generate telemetry packets
+- Serialize machine data as JSON
+- Publish sensor readings at regular intervals
+
 ---
 
-## Mosquitto Broker
+## 3. Eclipse Mosquitto Broker
 
-Acts as the communication layer between publishers and subscribers.
+Mosquitto serves as the messaging backbone of the system.
 
-Responsibilities
+Responsibilities:
 
 - Receive MQTT messages
-- Forward messages
-- Decouple data producers and consumers
+- Route messages to subscribers
+- Decouple producers and consumers
+- Deliver live telemetry to the Flutter application
 
 ---
 
-## MQTT Subscriber
+## 4. MQTT Subscriber
 
-Receives sensor data and stores it into MySQL.
+The MQTT Subscriber consumes live telemetry from Mosquitto.
 
-Responsibilities
+Responsibilities:
 
-- Subscribe to MQTT topic
-- Parse JSON payload
-- Save data into database
+- Subscribe to sensor topics
+- Parse incoming JSON payloads
+- Store telemetry in MySQL
+- Trigger AI prediction
+- Publish prediction results
+
+**Subscribed Topic**
+
+```text
+machines/sensors
+```
+
+**Published Topic**
+
+```text
+machines/predictions
+```
 
 ---
 
-## MySQL
+## 5. TensorFlow Prediction Engine
 
-Stores
+The prediction engine processes historical sensor readings using an LSTM model.
 
-- Machines
-- Sensor History
-- Predictions
-- Alerts
+Outputs:
 
----
-
-## TensorFlow Prediction Engine
-
-Uses the latest twenty sensor readings to estimate
-
-- Health Score
+- Machine Health Score
 - Failure Probability
-- Remaining Useful Life
+- Remaining Useful Life (RUL)
 - Maintenance Recommendation
 
+Prediction results are:
+
+- Stored in MySQL
+- Published through MQTT
+- Available through FastAPI
+
 ---
 
-## FastAPI
+## 6. MySQL Database
 
-Provides REST APIs for frontend applications.
+The database stores all persistent information generated by the platform.
 
-Responsibilities
+Tables include:
+
+- machines
+- sensor_data
+- predictions
+- alerts
+
+This enables historical analysis and API-based retrieval.
+
+---
+
+## 7. FastAPI Backend
+
+FastAPI exposes REST endpoints used by the mobile application.
+
+Responsibilities:
 
 - Prediction API
-- History API
+- Machine History API
 - Alerts API
 - Swagger Documentation
 
+The Flutter application consumes these APIs for non-real-time data such as history and alerts.
+
 ---
 
-# Data Flow
+## 8. Flutter Mobile Application
 
-Digital Twin
+The Flutter application provides a real-time monitoring interface for industrial operators.
 
-↓
+Modules include:
 
-Publisher
+- Fleet Dashboard
+- Machine Details
+- AI Predictions
+- Machine History
+- Alerts
+- System Status
 
-↓
+The application uses two communication mechanisms:
 
-Mosquitto
+### MQTT
 
-↓
+For:
 
-Subscriber
+- Live Telemetry
+- Live Predictions
 
-↓
+### REST APIs
 
-Sensor Repository
+For:
 
-↓
+- Historical Sensor Data
+- Active Alerts
 
-MySQL
+This hybrid communication model provides both low-latency monitoring and reliable historical data access.
 
-↓
+---
 
-Prediction Service
+# End-to-End Data Flow
 
-↓
-
-TensorFlow Model
-
-↓
-
-Prediction Repository
-
-↓
-
-REST APIs
-
-↓
-
-Angular / Flutter
+```text
+Digital Twin Simulator
+        │
+        ▼
+MQTT Publisher
+        │
+        ▼
+Mosquitto MQTT Broker
+        │
+        ├──────────────► Flutter Dashboard
+        │                     (Live MQTT)
+        │
+        ▼
+MQTT Subscriber
+        │
+        ▼
+MySQL Database
+        │
+        ▼
+TensorFlow Prediction Engine
+        │
+        ▼
+Prediction Results
+        │
+        ├──────────────► MQTT Predictions
+        │                     │
+        │                     ▼
+        │              Flutter Dashboard
+        │
+        ▼
+FastAPI REST APIs
+        │
+        ▼
+History • Alerts • Prediction Endpoints
+        │
+        ▼
+Flutter Mobile Application
+```
 
 ---
 
 # Technology Stack
 
-Backend
+## Backend
 
-- Python
+- Python 3.11
 - FastAPI
 - SQLAlchemy
 - Pydantic
 
-Database
-
-- MySQL
-
-Machine Learning
+## Machine Learning
 
 - TensorFlow
 - NumPy
 - Pandas
 - Scikit-Learn
+- Joblib
 
-Messaging
+## Database
+
+- MySQL 8
+
+## Messaging
 
 - MQTT
-- Mosquitto
+- Eclipse Mosquitto
 
-Deployment
+## Mobile Application
+
+- Flutter
+- Provider
+- MQTT Client
+- REST API Integration
+
+## DevOps
 
 - Docker
 - Docker Compose

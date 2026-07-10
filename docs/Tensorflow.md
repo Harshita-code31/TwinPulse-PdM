@@ -1,23 +1,20 @@
 # TensorFlow Prediction Engine
 
-## Overview
-
-The Predictive Maintenance System uses a TensorFlow LSTM model to predict machine health using historical sensor readings.
-
-The model estimates
-
-- Machine Health Score
-- Failure Probability
-- Remaining Useful Life (RUL)
-- Maintenance Recommendation
+# PredictivePulse
 
 ---
 
-# Input Features
+# Overview
 
-The prediction model uses the latest twenty sensor readings.
+PredictivePulse uses a TensorFlow LSTM model to estimate the health of industrial machines using historical telemetry collected from the Digital Twin Simulator.
 
-Features
+The model analyzes recent machine behavior and predicts future machine health rather than simply detecting current faults.
+
+---
+
+# Inputs
+
+The model processes:
 
 - Machine Type
 - Operating Hours
@@ -35,21 +32,29 @@ Features
 
 ---
 
-# Preprocessing Pipeline
+# Outputs
 
-Raw Sensor Data
+The model predicts:
+
+- Health Score
+- Failure Probability
+- Remaining Useful Life (RUL)
+- Maintenance Recommendation
+
+---
+
+# Prediction Workflow
+
+```text
+Sensor Data
 
 ↓
 
-Label Encoding
+Feature Engineering
 
 ↓
 
 Feature Scaling
-
-↓
-
-Tensor Conversion
 
 ↓
 
@@ -59,164 +64,32 @@ TensorFlow LSTM
 
 Prediction
 
----
-
-# Encoders
-
-Categorical Features
-
-- Machine Type
-- Fault Type
-
-These are converted into numerical values using trained Label Encoders.
-
----
-
-# Feature Scaling
-
-Numerical features are normalized using a trained Standard Scaler.
-
-This ensures consistent input to the neural network.
-
----
-
-# TensorFlow Model
-
-Framework
-
-```
-TensorFlow
-```
-
-Model Type
-
-```
-LSTM Neural Network
-```
-
-Input
-
-```
-20 consecutive sensor readings
-```
-
-Output
-
-```
-Health Score
-```
-
----
-
-# Health Score
-
-Range
-
-```
-0 - 100
-```
-
-Higher value
-
-```
-Better machine condition
-```
-
-Lower value
-
-```
-Poor machine health
-```
-
----
-
-# Failure Probability
-
-Calculated as
-
-```
-100 - Health Score
-```
-
-Example
+↓
 
 Health Score
 
-```
-82
-```
+↓
 
-Failure Probability
-
-```
-18%
+Recommendation
 ```
 
 ---
 
-# Remaining Useful Life
+# Integration
 
-Estimated using the predicted health score.
+After prediction:
 
-Current Formula
-
-```
-Health Score × 2
-```
-
-Future versions may replace this heuristic with a dedicated RUL prediction model.
+1. Results are stored inside MySQL.
+2. Prediction packets are published through MQTT.
+3. Flutter receives prediction updates in real time.
+4. FastAPI exposes prediction history through REST APIs.
 
 ---
 
-# Recommendation Engine
+# Prediction Pipeline
 
-Health Score ≥ 90
-
-```
-Machine Healthy
-```
-
-Health Score ≥ 70
-
-```
-Monitor Machine
-```
-
-Health Score ≥ 50
-
-```
-Schedule Inspection
-```
-
-Health Score ≥ 30
-
-```
-Maintenance Required
-```
-
-Health Score < 30
-
-```
-Immediate Shutdown Recommended
-```
-
----
-
-# Prediction Workflow
-
-Latest Sensor Readings
-
-↓
-
-Repository
-
-↓
-
-Prediction Service
-
-↓
-
-Preprocessing
+```text
+Telemetry
 
 ↓
 
@@ -226,31 +99,31 @@ TensorFlow Model
 
 Prediction
 
+├────────► MQTT
+
+│              │
+
+│              ▼
+
+│        Flutter Dashboard
+
+│
+
+▼
+
+MySQL
+
 ↓
 
-Prediction Repository
+FastAPI
 
 ↓
 
-Alert Generation
-
-↓
-
-REST API
-
----
-
-# Future Improvements
-
-- Real Remaining Useful Life Model
-- Online Model Retraining
-- Fault Classification
-- Explainable AI (XAI)
-- Confidence Scores
-- Edge AI Deployment
+History APIs
+```
 
 ---
 
 # Summary
 
-The TensorFlow Prediction Engine forms the core intelligence of the Predictive Maintenance System by continuously evaluating machine health and providing actionable maintenance insights from real-time industrial sensor data.
+TensorFlow serves as the intelligence layer of PredictivePulse by transforming live telemetry into actionable maintenance insights that are simultaneously stored, published, and visualized.

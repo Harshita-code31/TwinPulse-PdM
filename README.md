@@ -1,32 +1,71 @@
-# 🚀 Predictive Maintenance System
+# 🚀 PredictivePulse
 
-An industry-grade IoT Predictive Maintenance platform that monitors industrial machines using Digital Twins, streams sensor data through MQTT, stores telemetry in MySQL, predicts machine health using a TensorFlow LSTM model, and exposes REST APIs through FastAPI for dashboards and mobile applications.
+### Industrial AI Predictive Maintenance Platform
+
+PredictivePulse is an end-to-end Industrial IoT Predictive Maintenance Platform that combines Digital Twin simulation, MQTT messaging, TensorFlow-based machine learning, FastAPI services, MySQL data storage, Dockerized deployment, and a Flutter mobile application for real-time industrial monitoring.
+
+The platform continuously simulates industrial machines, streams live telemetry through MQTT, predicts machine health using an LSTM model, estimates failure probability and Remaining Useful Life (RUL), stores historical sensor data, generates maintenance alerts, and visualizes the entire system through a live mobile dashboard.
 
 ---
 
-# 📖 Overview
+# 📖 Project Overview
 
-This project simulates multiple industrial machines, continuously collects sensor readings, predicts machine health using Machine Learning, estimates failure probability and remaining useful life (RUL), generates maintenance alerts, and stores historical data for analysis.
+PredictivePulse was developed as an industry-oriented Predictive Maintenance solution capable of simulating real industrial equipment and demonstrating a complete IIoT pipeline from sensor generation to AI-driven maintenance recommendations.
 
-The backend is containerized using Docker and designed to integrate seamlessly with both an Angular web dashboard and a Flutter mobile application.
+The project integrates multiple technologies into a single production-style architecture including:
+
+- Digital Twin Simulation
+- MQTT Communication
+- TensorFlow Machine Learning
+- FastAPI REST Services
+- MySQL Database
+- Docker Containers
+- Flutter Mobile Dashboard
 
 ---
 
 # ✨ Features
 
+## Industrial Simulation
+
 - Digital Twin Machine Simulator
 - Multi-Machine Real-Time Simulation
-- MQTT Communication (Mosquitto)
-- FastAPI REST Backend
-- TensorFlow LSTM Prediction Model
-- Machine Health Prediction
+- Live Sensor Data Generation
+- Fault Injection Engine
+
+## Artificial Intelligence
+
+- TensorFlow LSTM Health Prediction
 - Failure Probability Estimation
 - Remaining Useful Life (RUL)
-- Automatic Alert Generation
-- Historical Sensor Data Storage
+- Maintenance Recommendation Engine
+
+## Backend
+
+- FastAPI REST APIs
+- MQTT Publisher & Subscriber
 - MySQL Database Integration
-- Dockerized Backend Infrastructure
-- Interactive Swagger API Documentation
+- Historical Sensor Storage
+- Alert Generation
+- Swagger API Documentation
+
+## Mobile Application
+
+- Flutter Dashboard
+- Live Fleet Monitoring
+- Machine Details
+- AI Predictions
+- History Viewer
+- Alerts
+- System Status
+- MQTT Live Updates
+
+## Infrastructure
+
+- Dockerized Deployment
+- Mosquitto MQTT Broker
+- MySQL Database
+- Containerized Backend
 
 ---
 
@@ -57,56 +96,50 @@ The backend is containerized using Docker and designed to integrate seamlessly w
 - MQTT
 - Eclipse Mosquitto
 
+## Mobile Application
+
+- Flutter
+- Provider
+- MQTT Client
+- HTTP REST API
+
 ## DevOps
 
 - Docker
 - Docker Compose
-
-## Planned Frontend
-
-- Angular
-
-## Planned Mobile Application
-
-- Flutter
 
 ---
 
 # 🏗 System Architecture
 
 ```text
-                +----------------------+
-                |  Digital Twin        |
-                |  Machine Simulator   |
-                +----------+-----------+
-                           |
-                           v
-                  MQTT Publisher (Local)
-                           |
-                           v
-                  Eclipse Mosquitto (Docker)
-                           |
-                           v
-                  MQTT Subscriber (Local)
-                           |
-                           v
-                    MySQL Database (Docker)
-                           |
-                           v
-                TensorFlow Prediction Engine
-                           |
-                           v
-                  FastAPI Backend (Docker)
-                           |
-          +----------------+----------------+
-          |                                 |
-          v                                 v
-  Angular Dashboard (Planned)      Flutter App (Planned)
+                     Digital Twin Simulator
+                              │
+                              ▼
+                      MQTT Publisher
+                              │
+                              ▼
+                   Mosquitto MQTT Broker
+                              │
+          ┌───────────────────┴───────────────────┐
+          │                                       │
+          ▼                                       ▼
+  MQTT Subscriber                         Flutter App
+          │                           (Live MQTT Updates)
+          │                                       ▲
+          ▼                                       │
+ TensorFlow Prediction Engine                     │
+          │                                       │
+          ▼                                       │
+      MySQL Database ───────────────► FastAPI REST APIs
+                                             │
+                                             ▼
+                               History • Alerts • Predictions
 ```
 
 ---
 
-# 📁 Project Structure
+# 📂 Project Structure
 
 ```text
 PredictiveMaintenance_V2/
@@ -127,26 +160,29 @@ PredictiveMaintenance_V2/
 │   ├── .env.docker
 │   └── Dockerfile
 │
-├── artifacts/
-│   ├── scalers/
-│   └── trained_models/
+├── frontend_flutter/
+│   ├── android/
+│   ├── ios/
+│   ├── lib/
+│   ├── web/
+│   ├── pubspec.yaml
+│   └── analysis_options.yaml
 │
+├── artifacts/
 ├── data/
 ├── docs/
-├── frontend-angular/
-├── mobile-flutter/
 │
 ├── docker-compose.yml
 ├── requirements.txt
-├── .gitignore
-└── README.md
+├── README.md
+└── .gitignore
 ```
 
 ---
 
-# ⚙️ Configuration
+# ⚙️ Environment Configuration
 
-The project uses separate environment configurations for local development and Docker deployment.
+The project uses separate configurations for local development and Docker deployment.
 
 ### Local Development
 
@@ -169,8 +205,6 @@ Used by:
 
 - FastAPI Backend
 
-This separation avoids conflicts between Docker networking (`mysql`, `mosquitto`) and local execution (`localhost`).
-
 ---
 
 # 🚀 Running the Project
@@ -185,10 +219,10 @@ cd PredictiveMaintenance_V2
 
 ---
 
-## 2. Start Docker Services
+## 2. Start Docker
 
 ```bash
-docker compose up --build
+docker compose up -d
 ```
 
 This starts:
@@ -217,7 +251,33 @@ cd backend
 python -m app.mqtt.publisher
 ```
 
-The publisher continuously streams simulated sensor data for multiple industrial machines.
+---
+
+## 5. Launch Flutter Application
+
+```bash
+cd frontend_flutter
+
+flutter pub get
+
+flutter run
+```
+
+---
+
+# 📱 Flutter Application
+
+The mobile application provides real-time monitoring of the industrial fleet.
+
+### Screens
+
+- Splash Screen
+- Fleet Dashboard
+- Machine Details
+- AI Predictions
+- Sensor History
+- Alerts
+- System Status
 
 ---
 
@@ -231,15 +291,13 @@ http://localhost:8000/docs
 
 ---
 
-# 📡 API Endpoints
+# 📡 REST API Endpoints
 
 ## Health Check
 
 ```
 GET /
 ```
-
-Returns backend status.
 
 ---
 
@@ -251,10 +309,10 @@ GET /prediction/{machine_id}
 
 Returns
 
-- Machine Health Score
+- Health Score
 - Failure Probability
 - Remaining Useful Life
-- Maintenance Recommendation
+- Recommendation
 
 ---
 
@@ -264,8 +322,6 @@ Returns
 GET /history/{machine_id}
 ```
 
-Returns historical sensor readings for a machine.
-
 ---
 
 ## Active Alerts
@@ -274,46 +330,28 @@ Returns historical sensor readings for a machine.
 GET /alerts
 ```
 
-Returns all active maintenance alerts.
-
 ---
 
 # 🤖 Machine Learning Pipeline
 
-```
+```text
 Sensor Data
-
-        │
-
-        ▼
-
+      │
+      ▼
 Feature Engineering
-
-        │
-
-        ▼
-
+      │
+      ▼
 Feature Scaling
-
-        │
-
-        ▼
-
+      │
+      ▼
 TensorFlow LSTM Model
-
-        │
-
-        ▼
-
+      │
+      ▼
 Health Score Prediction
-
-        │
-
-        ├────────────► Failure Probability
-
-        ├────────────► Remaining Useful Life
-
-        └────────────► Maintenance Recommendation
+      │
+      ├────────► Failure Probability
+      ├────────► Remaining Useful Life
+      └────────► Maintenance Recommendation
 ```
 
 ---
@@ -329,7 +367,7 @@ Health Score Prediction
 
 ---
 
-# 📊 Database Tables
+# 🗄 Database Tables
 
 - machines
 - sensor_data
@@ -340,94 +378,67 @@ Health Score Prediction
 
 # 🔄 Data Flow
 
-```
-Digital Twin Machine
-
-↓
-
+```text
+Digital Twin Simulator
+        │
+        ▼
 MQTT Publisher
-
-↓
-
+        │
+        ▼
 Mosquitto Broker
-
-↓
-
+        │
+        ▼
 MQTT Subscriber
-
-↓
-
-MySQL Database
-
-↓
-
+        │
+        ▼
 TensorFlow Prediction Engine
-
-↓
-
-Prediction Repository
-
-↓
-
+        │
+        ▼
+MySQL Database
+        │
+        ▼
 FastAPI REST API
+        │
+        ├────────► Flutter Dashboard (REST)
+        │
+        └────────► History & Alerts APIs
 
-↓
-
-Angular Dashboard (Planned)
-
-Flutter Mobile App (Planned)
+MQTT Broker
+        │
+        ▼
+Flutter Live Dashboard (MQTT)
 ```
 
 ---
 
-# 📌 Current Status
+# 📊 Current Project Status
 
-## Backend
-
-- ✅ Complete
-
-## Machine Learning
-
-- ✅ Complete
-
-## Database
-
-- ✅ Complete
-
-## Docker
-
-- ✅ Complete
-
-## MQTT Communication
-
-- ✅ Complete
-
-## REST APIs
-
-- ✅ Complete
-
-## Angular Dashboard
-
-- 🚧 Planned
-
-## Flutter Mobile Application
-
-- 🚧 Planned
+| Module | Status |
+|---------|--------|
+| Backend | ✅ Complete |
+| Digital Twin Simulator | ✅ Complete |
+| Machine Learning | ✅ Complete |
+| MQTT Communication | ✅ Complete |
+| FastAPI APIs | ✅ Complete |
+| MySQL Database | ✅ Complete |
+| Docker Deployment | ✅ Complete |
+| Flutter Mobile App | ✅ Complete |
+| End-to-End Integration | ✅ Complete |
 
 ---
 
 # 🚀 Future Enhancements
 
-- Angular Monitoring Dashboard
-- Flutter Mobile Application
+- Angular Web Dashboard
 - User Authentication
 - Role-Based Access Control
+- Push Notifications
 - Predictive Maintenance Scheduling
-- Email & SMS Alerts
-- Real Industrial Sensor Integration
-- Cloud Deployment
+- Cloud Deployment (AWS / Azure)
+- Real Industrial PLC Integration
 - CI/CD Pipeline
 - Monitoring & Logging
+- Conveyor Model Retraining
 
 ---
 
@@ -435,8 +446,14 @@ Flutter Mobile App (Planned)
 
 **Sai Sanjanaa P R**
 
-B.E Computer Science and Engineering (Internet of Things)
+B.E. Computer Science and Engineering (Internet of Things)
 
 Sri Sairam Engineering College
 
 Industrial IoT & AI Predictive Maintenance Internship Project
+
+---
+
+## ⭐ Acknowledgement
+
+This project was developed as part of an Industrial IoT & AI internship to demonstrate an end-to-end Predictive Maintenance platform using modern software engineering, machine learning, messaging, and mobile technologies.

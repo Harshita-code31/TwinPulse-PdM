@@ -1,163 +1,345 @@
 # MQTT Communication
 
-## Overview
+# PredictivePulse
 
-The Predictive Maintenance System uses MQTT to transmit sensor readings from simulated industrial machines to the backend.
-
-MQTT provides lightweight, real-time communication between publishers and subscribers.
+### MQTT Messaging Architecture
 
 ---
 
-# Architecture
+# Overview
 
-```
-Digital Twin
+PredictivePulse uses the **MQTT (Message Queuing Telemetry Transport)** protocol as the primary communication mechanism for real-time data exchange between different components of the platform.
 
-↓
+MQTT enables lightweight, low-latency, publish-subscribe communication, making it ideal for Industrial Internet of Things (IIoT) applications where continuous sensor streaming is required.
 
-Publisher
+The platform uses **Eclipse Mosquitto** as the MQTT broker.
 
-↓
+---
 
-Mosquitto Broker
+# Why MQTT?
 
-↓
+Industrial monitoring systems require:
 
-Subscriber
+- Low network overhead
+- Fast message delivery
+- Reliable communication
+- Loose coupling between components
+- Scalability
 
-↓
+MQTT satisfies these requirements by allowing producers and consumers to communicate without knowing about each other.
 
-Database
+---
+
+# MQTT Architecture
+
+```text
+                 Digital Twin Simulator
+                          │
+                          ▼
+                   MQTT Publisher
+                          │
+                          ▼
+             Eclipse Mosquitto Broker
+                │                 │
+                │                 │
+                ▼                 ▼
+      MQTT Subscriber      Flutter Mobile App
+                │
+                ▼
+      TensorFlow Prediction Engine
+                │
+                ▼
+        MQTT Prediction Publisher
+                │
+                ▼
+      Eclipse Mosquitto Broker
+                │
+                ▼
+      Flutter Mobile Application
 ```
 
 ---
 
-# MQTT Broker
+# MQTT Topics
 
-Broker
+The platform currently uses two MQTT topics.
 
-```
-Eclipse Mosquitto
-```
+## Sensor Telemetry
 
-Runs inside Docker.
-
-Default Port
-
-```
-1883
-```
-
----
-
-# MQTT Topic
-
-```
+```text
 machines/sensors
 ```
 
-All sensor data is published to this topic.
+Published by:
+
+- MQTT Publisher
+
+Subscribed by:
+
+- MQTT Subscriber
+- Flutter Mobile Application
 
 ---
 
-# Publisher
+## AI Predictions
 
-Responsibilities
+```text
+machines/predictions
+```
 
-- Simulate industrial machines
-- Generate sensor readings
-- Publish JSON payloads
-- Repeat continuously
+Published by:
+
+- MQTT Subscriber
+
+Subscribed by:
+
+- Flutter Mobile Application
 
 ---
 
-# Subscriber
+# Message Flow
 
-Responsibilities
+## Step 1
 
-- Subscribe to MQTT topic
-- Receive JSON payload
-- Parse sensor readings
-- Save to MySQL
+The Digital Twin Simulator generates sensor readings.
+
+Example:
+
+- Temperature
+- RPM
+- Torque
+- Vibration
+- Current
+- Oil Level
+
+---
+
+## Step 2
+
+The MQTT Publisher serializes the sensor data into JSON and publishes it to:
+
+```text
+machines/sensors
+```
+
+---
+
+## Step 3
+
+The MQTT Subscriber receives the telemetry.
+
+Responsibilities:
+
+- Parse JSON
+- Store telemetry
+- Trigger AI prediction
+- Publish prediction results
+
+---
+
+## Step 4
+
+The TensorFlow prediction engine calculates:
+
+- Health Score
+- Failure Probability
+- Remaining Useful Life
+- Recommendation
+
+---
+
+## Step 5
+
+Prediction results are published to:
+
+```text
+machines/predictions
+```
+
+---
+
+## Step 6
+
+The Flutter application subscribes to both topics.
+
+It receives:
+
+### Live Telemetry
+
+```text
+machines/sensors
+```
+
+Displays:
+
+- Temperature
+- RPM
+- Torque
+- Current
+- Oil Level
+- Machine Health
+
+---
+
+### Live Predictions
+
+```text
+machines/predictions
+```
+
+Displays:
+
+- Failure Probability
+- Remaining Useful Life
+- AI Recommendation
 
 ---
 
 # JSON Payload
 
-Example
+Example telemetry packet:
 
 ```json
 {
-    "machine_id": 1,
-    "machine_type": "Gearbox",
-    "temperature": 72.4,
-    "rpm": 1492,
-    "torque": 98.6,
-    "vibration": 1.74,
-    "current": 11.2,
-    "oil_level": 88.3,
-    "operating_hours": 520,
-    "machine_age": 4,
-    "ambient_temperature": 31,
-    "operating_load": 67,
-    "maintenance_count": 2,
-    "fault_type": "Healthy",
-    "timestamp": "2026-07-03T10:20:14"
+  "machine_id": 1,
+  "machine_name": "Gearbox-1",
+  "machine_type": "Gearbox",
+  "temperature": 61.4,
+  "rpm": 1452,
+  "torque": 119.8,
+  "vibration": 1.25,
+  "current": 6.41,
+  "oil_level": 99.8,
+  "health_score": 99.8,
+  "fault_type": "Healthy"
 }
 ```
 
 ---
 
-# Communication Flow
+Example prediction packet:
 
-Machine
+```json
+{
+  "machine_id": 1,
+  "health_score": 96.45,
+  "failure_probability": 3.55,
+  "remaining_useful_life": 192.9,
+  "recommendation": "Machine Healthy"
+}
+```
 
-↓
+---
+
+# MQTT Components
+
+## MQTT Publisher
+
+Responsibilities:
+
+- Generate telemetry
+- Publish sensor packets
+- Simulate Digital Twins
+
+---
+
+## Mosquitto Broker
+
+Responsibilities:
+
+- Receive MQTT packets
+- Route messages
+- Manage subscriptions
+- Deliver live updates
+
+---
+
+## MQTT Subscriber
+
+Responsibilities:
+
+- Receive telemetry
+- Store sensor data
+- Execute AI prediction
+- Publish prediction packets
+
+---
+
+## Flutter MQTT Client
+
+Responsibilities:
+
+- Subscribe to sensor topic
+- Subscribe to prediction topic
+- Update dashboard in real time
+- Display live machine information
+
+---
+
+# Communication Model
+
+```text
+Telemetry
 
 Publisher
+     │
+     ▼
+machines/sensors
+     │
+     ├────────► Subscriber
+     │
+     └────────► Flutter Dashboard
 
-↓
 
-MQTT Topic
-
-↓
-
-Mosquitto
-
-↓
+Predictions
 
 Subscriber
-
-↓
-
-Sensor Repository
-
-↓
-
-MySQL
-
----
-
-# Advantages of MQTT
-
-- Lightweight
-- Low latency
-- Publish/Subscribe architecture
-- Supports multiple machines
-- Easy integration with IoT devices
+     │
+     ▼
+machines/predictions
+     │
+     ▼
+Flutter Dashboard
+```
 
 ---
 
-# Future Improvements
+# Advantages of the Architecture
 
-- MQTT Authentication
-- QoS Levels
-- TLS Encryption
-- Cloud MQTT Broker
-- Device Authentication
+The MQTT-based design provides several advantages.
+
+## Loose Coupling
+
+Publishers and subscribers operate independently.
+
+---
+
+## Scalability
+
+Additional machines and clients can be added without modifying existing components.
+
+---
+
+## Real-Time Monitoring
+
+Sensor updates are immediately delivered to the Flutter application.
+
+---
+
+## Efficient Network Usage
+
+Only small JSON payloads are transmitted.
+
+---
+
+## Extensibility
+
+Additional MQTT clients such as web dashboards or cloud services can subscribe without changing the existing architecture.
 
 ---
 
 # Summary
 
-MQTT acts as the communication layer between Digital Twin machines and the backend database, enabling scalable and real-time industrial data streaming.
+MQTT serves as the real-time communication backbone of PredictivePulse.
+
+It connects the Digital Twin Simulator, AI prediction engine, backend services, and Flutter mobile application into a unified Industrial IoT platform capable of live monitoring and predictive maintenance.

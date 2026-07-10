@@ -1,56 +1,95 @@
 # Deployment Guide
 
-## Overview
+# PredictivePulse
 
-This document explains how to set up and run the Predictive Maintenance Backend for local development.
+### Industrial AI Predictive Maintenance Platform
 
-The backend consists of:
+---
 
-- FastAPI Backend
+# Overview
+
+This document explains how to deploy and run the complete PredictivePulse platform in a local development environment.
+
+The platform consists of:
+
+- Dockerized Backend
 - MySQL Database
 - Eclipse Mosquitto MQTT Broker
+- TensorFlow Prediction Engine
+- FastAPI REST APIs
 - MQTT Publisher
 - MQTT Subscriber
-- TensorFlow Prediction Engine
+- Flutter Mobile Application
 
 ---
 
-# Prerequisites
+# System Requirements
 
-Install the following software before running the project.
+## Software
 
-## Python
-
-Version
-
-```
-Python 3.11+
-```
+- Python 3.11+
+- Flutter SDK
+- Docker Desktop
+- Git
 
 ---
 
-## Docker
+## Python Packages
 
-Install Docker Desktop.
-
-Verify installation
+Install the project dependencies:
 
 ```bash
-docker --version
-docker compose version
+pip install -r requirements.txt
 ```
 
 ---
 
-## Git
+# Project Structure
 
-```bash
-git --version
+```text
+PredictiveMaintenance_V2/
+
+├── backend/
+├── frontend_flutter/
+├── artifacts/
+├── docs/
+├── data/
+├── docker-compose.yml
+└── requirements.txt
 ```
 
 ---
 
-# Clone Repository
+# Environment Configuration
+
+Two environment files are used.
+
+## Local Development
+
+```text
+backend/.env.local
+```
+
+Used by:
+
+- MQTT Publisher
+- MQTT Subscriber
+
+---
+
+## Docker Deployment
+
+```text
+backend/.env.docker
+```
+
+Used by:
+
+- FastAPI Backend
+
+---
+
+# Step 1 — Clone Repository
 
 ```bash
 git clone <repository-url>
@@ -60,7 +99,7 @@ cd PredictiveMaintenance_V2
 
 ---
 
-# Install Python Dependencies
+# Step 2 — Install Python Dependencies
 
 ```bash
 pip install -r requirements.txt
@@ -68,69 +107,43 @@ pip install -r requirements.txt
 
 ---
 
-# Environment Files
+# Step 3 — Start Docker Services
 
-The backend uses two environment configurations.
-
-## Local Development
-
-```
-backend/.env.local
-```
-
-Used by
-
-- MQTT Publisher
-- MQTT Subscriber
-
-Uses
-
-```
-localhost
-```
-
----
-
-## Docker
-
-```
-backend/.env.docker
-```
-
-Used by
-
-- FastAPI
-
-Uses
-
-```
-mysql
-mosquitto
-```
-
-This separation avoids networking conflicts between Docker containers and local development.
-
----
-
-# Start Backend
-
-Start Docker services.
+Launch all backend containers.
 
 ```bash
-docker compose up --build
+docker compose up -d
 ```
 
-This starts
+Verify the running containers.
 
-- MySQL
-- Mosquitto MQTT Broker
-- FastAPI Backend
+```bash
+docker ps
+```
+
+Expected containers:
+
+- pdm_backend
+- pdm_mysql
+- pdm_mosquitto
 
 ---
 
-# Start Subscriber
+# Step 4 — Verify Backend
 
-Open another terminal.
+Open the Swagger interface.
+
+```text
+http://localhost:8000/docs
+```
+
+If Swagger loads successfully, the FastAPI backend is operational.
+
+---
+
+# Step 5 — Start MQTT Subscriber
+
+Open a terminal.
 
 ```bash
 cd backend
@@ -138,9 +151,16 @@ cd backend
 python -m app.mqtt.subscriber
 ```
 
+The subscriber will:
+
+- Listen for MQTT telemetry
+- Store sensor data
+- Run AI prediction
+- Publish prediction results
+
 ---
 
-# Start Publisher
+# Step 6 — Start Digital Twin Simulator
 
 Open another terminal.
 
@@ -150,48 +170,79 @@ cd backend
 python -m app.mqtt.publisher
 ```
 
-The publisher continuously generates sensor data for multiple industrial machines.
+The simulator continuously generates telemetry for multiple industrial machines.
 
 ---
 
-# Swagger Documentation
+# Step 7 — Launch Flutter Application
 
-Open
-
-```
-http://localhost:8000/docs
-```
-
-Available APIs
-
-- Prediction
-- History
-- Alerts
-
----
-
-# Verify Database
-
-Connect
+Open a new terminal.
 
 ```bash
-docker exec -it pdm_mysql mysql -uroot -proot
+cd frontend_flutter
+
+flutter pub get
+
+flutter run
 ```
 
-Use
+---
 
-```sql
-USE predictive_maintenance;
+# Physical Android Device
+
+When testing on a physical Android device:
+
+Replace
+
+```dart
+10.0.2.2
 ```
 
-Example
+with
 
-```sql
-SELECT COUNT(*) FROM sensor_data;
+```text
+YOUR_PC_IP
+```
 
-SELECT * FROM predictions;
+inside
 
-SELECT * FROM alerts;
+```text
+lib/services/mqtt_service.dart
+```
+
+and
+
+```text
+lib/services/api_service.dart
+```
+
+Ensure:
+
+- Laptop and phone are connected to the same Wi-Fi network.
+- FastAPI is running using:
+
+```bash
+uvicorn app.main:app --host 0.0.0.0 --port 8000
+```
+
+Windows Firewall should allow incoming connections on the local network.
+
+---
+
+# Runtime Sequence
+
+The recommended startup order is:
+
+```text
+1. Docker Containers
+
+2. FastAPI Backend
+
+3. MQTT Subscriber
+
+4. MQTT Publisher
+
+5. Flutter Application
 ```
 
 ---
@@ -202,69 +253,87 @@ SELECT * FROM alerts;
 |----------|------|
 | FastAPI | 8000 |
 | MySQL | 3306 |
-| MQTT | 1883 |
-| MQTT WebSocket | 9001 |
+| Mosquitto MQTT | 1883 |
+| Mosquitto WebSocket | 9001 |
+
+---
+
+# Verification Checklist
+
+After deployment, verify the following:
+
+✅ Docker containers are running
+
+✅ FastAPI Swagger is accessible
+
+✅ MQTT Subscriber receives telemetry
+
+✅ Digital Twin publishes sensor data
+
+✅ TensorFlow predictions are generated
+
+✅ Flutter dashboard connects successfully
+
+✅ Live machine telemetry updates
+
+✅ History API returns records
+
+✅ Alerts API returns active alerts
 
 ---
 
 # Troubleshooting
 
-## Backend not starting
+## MQTT Connection Failed
 
-Check
+Verify:
 
-```bash
-docker compose logs backend
-```
+- Mosquitto container is running.
+- MQTT broker address is correct.
+- Port 1883 is accessible.
 
 ---
 
-## MQTT not publishing
+## FastAPI Not Reachable
 
-Verify Mosquitto is running
+Verify:
 
-```bash
-docker ps
-```
+- Docker container is running.
+- Port 8000 is available.
+- Swagger loads successfully.
+
+---
+
+## Flutter Shows No Live Data
+
+Check:
+
+- MQTT Publisher is running.
+- MQTT Subscriber is running.
+- Flutter is connected to the correct MQTT broker.
+- Physical devices use the laptop's local IP address instead of `10.0.2.2`.
 
 ---
 
 ## Database Connection Error
 
-Verify
+Verify:
 
-```
-MySQL container is running
-
-Port 3306 is available
-```
+- MySQL container is running.
+- Environment variables are correct.
+- Database credentials match the Docker configuration.
 
 ---
 
-# Deployment Workflow
+# Deployment Summary
 
-Docker
+The PredictivePulse deployment consists of:
 
-↓
+- Digital Twin Simulator
+- MQTT Messaging
+- TensorFlow Prediction Engine
+- MySQL Database
+- FastAPI Backend
+- Flutter Mobile Application
 
-MySQL
-
-Mosquitto
-
-FastAPI
-
-↓
-
-Publisher
-
-↓
-
-Subscriber
-
-↓
-
-Machine Prediction
-
-↓
-
-REST APIs
+Together, these components create a complete end-to-end Industrial AI Predictive Maintenance platform capable of real-time monitoring, predictive analytics, and mobile visualization.
