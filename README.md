@@ -6,16 +6,6 @@ TwinPulse-PdM is an end-to-end Industrial IoT Predictive Maintenance Platform th
 
 The platform continuously simulates industrial machines, streams live telemetry through MQTT, predicts machine health using an LSTM model, estimates failure probability and Remaining Useful Life (RUL), stores historical sensor data, generates maintenance alerts, and visualizes the entire system through a live mobile dashboard.
 
-## Origin and development status
-
-TwinPulse-PdM builds on [PredictivePulse-IIoT](https://github.com/Saisanjanaa06/PredictivePulse-IIoT) by **Sai Sanjanaa P R**. The original Git history, author attribution, and [MIT license](LICENSE) are preserved.
-
-This version includes ongoing Docker, simulation, prediction-response, and preprocessing changes. The preprocessing pipeline now produces 12 input features, while inference still expects 13; training and inference alignment and model retraining remain unfinished. Existing completion claims below describe the inherited project and are not verification of this version.
-
-Local environment files must be supplied separately and must not be committed.
-
----
-
 # 📖 Project Overview
 
 TwinPulse-PdM was developed as an industry-oriented Predictive Maintenance solution capable of simulating real industrial equipment and demonstrating a complete IIoT pipeline from sensor generation to AI-driven maintenance recommendations.
@@ -419,23 +409,7 @@ Flutter Live Dashboard (MQTT)
 
 ---
 
-# 📊 Current Project Status
-
-| Module | Status |
-|---------|--------|
-| Backend | ✅ Complete |
-| Digital Twin Simulator | ✅ Complete |
-| Machine Learning | ✅ Complete |
-| MQTT Communication | ✅ Complete |
-| FastAPI APIs | ✅ Complete |
-| MySQL Database | ✅ Complete |
-| Docker Deployment | ✅ Complete |
-| Flutter Mobile App | ✅ Complete |
-| End-to-End Integration | ✅ Complete |
-
----
-
-# 🚀 Future Enhancements
+#  Future Enhancements
 
 - Angular Web Dashboard
 - User Authentication
