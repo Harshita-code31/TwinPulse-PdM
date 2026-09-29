@@ -1,16 +1,24 @@
-# 🚀 PredictivePulse
+# 🚀 TwinPulse-PdM
 
-### Industrial AI Predictive Maintenance Platform
+### Industrial Digital Twin & Predictive Maintenance
 
-PredictivePulse is an end-to-end Industrial IoT Predictive Maintenance Platform that combines Digital Twin simulation, MQTT messaging, TensorFlow-based machine learning, FastAPI services, MySQL data storage, Dockerized deployment, and a Flutter mobile application for real-time industrial monitoring.
+TwinPulse-PdM is an end-to-end Industrial IoT Predictive Maintenance Platform that combines Digital Twin simulation, MQTT messaging, TensorFlow-based machine learning, FastAPI services, MySQL data storage, Dockerized deployment, and a Flutter mobile application for real-time industrial monitoring.
 
 The platform continuously simulates industrial machines, streams live telemetry through MQTT, predicts machine health using an LSTM model, estimates failure probability and Remaining Useful Life (RUL), stores historical sensor data, generates maintenance alerts, and visualizes the entire system through a live mobile dashboard.
+
+## Origin and development status
+
+TwinPulse-PdM builds on [PredictivePulse-IIoT](https://github.com/Saisanjanaa06/PredictivePulse-IIoT) by **Sai Sanjanaa P R**. The original Git history, author attribution, and [MIT license](LICENSE) are preserved.
+
+This version includes ongoing Docker, simulation, prediction-response, and preprocessing changes. The preprocessing pipeline now produces 12 input features, while inference still expects 13; training and inference alignment and model retraining remain unfinished. Existing completion claims below describe the inherited project and are not verification of this version.
+
+Local environment files must be supplied separately and must not be committed.
 
 ---
 
 # 📖 Project Overview
 
-PredictivePulse was developed as an industry-oriented Predictive Maintenance solution capable of simulating real industrial equipment and demonstrating a complete IIoT pipeline from sensor generation to AI-driven maintenance recommendations.
+TwinPulse-PdM was developed as an industry-oriented Predictive Maintenance solution capable of simulating real industrial equipment and demonstrating a complete IIoT pipeline from sensor generation to AI-driven maintenance recommendations.
 
 The project integrates multiple technologies into a single production-style architecture including:
 
@@ -142,7 +150,7 @@ The project integrates multiple technologies into a single production-style arch
 # 📂 Project Structure
 
 ```text
-PredictiveMaintenance_V2/
+TwinPulse-PdM/
 
 │
 ├── backend/
@@ -212,9 +220,9 @@ Used by:
 ## 1. Clone Repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/Harshita-code31/TwinPulse-PdM.git
 
-cd PredictiveMaintenance_V2
+cd TwinPulse-PdM
 ```
 
 ---

@@ -10,10 +10,17 @@ services:
       MYSQL_DATABASE: predictive_maintenance
 
     ports:
-      - "3306:3306"
+      - "3307:3306"
 
     volumes:
       - mysql_data:/var/lib/mysql
+
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 15
+      start_period: 10s
 
   mosquitto:
     image: eclipse-mosquitto:2
@@ -35,12 +42,13 @@ services:
       dockerfile: backend/Dockerfile
 
     container_name: pdm_backend
-
     restart: unless-stopped
 
     depends_on:
-      - mysql
-      - mosquitto
+      mysql:
+        condition: service_healthy
+      mosquitto:
+        condition: service_started
 
     env_file:
       - ./backend/.env.docker
@@ -50,6 +58,52 @@ services:
 
     ports:
       - "8000:8000"
+
+  mqtt_subscriber:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+
+    container_name: pdm_subscriber
+    restart: unless-stopped
+
+    depends_on:
+      mysql:
+        condition: service_healthy
+      mosquitto:
+        condition: service_started
+      backend:
+        condition: service_started
+
+    env_file:
+      - ./backend/.env.docker
+
+    environment:
+      ENV_FILE: .env.docker
+
+    command: python -m app.mqtt.subscriber
+
+  digital_twin:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+
+    container_name: pdm_digital_twin
+    restart: unless-stopped
+
+    depends_on:
+      mosquitto:
+        condition: service_started
+      mqtt_subscriber:
+        condition: service_started
+
+    env_file:
+      - ./backend/.env.docker
+
+    environment:
+      ENV_FILE: .env.docker
+
+    command: python -m app.mqtt.publisher
 
 volumes:
   mysql_data:

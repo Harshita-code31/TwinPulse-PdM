@@ -90,3 +90,7 @@ mosquitto/log/
 
 # Processed training data
 artifacts/processed/
+
+# Local secrets and editor backups
+.env.*
+*.backup

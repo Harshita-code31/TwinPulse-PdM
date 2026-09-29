@@ -64,13 +64,19 @@ def predict_machine(db: Session, machine_id: int):
     print("Prediction:", prediction)
 
     prediction["machine_id"] = machine_id
-    prediction["predicted_fault"] = df.iloc[-1]["fault_type"]
+    prediction["simulation_fault"] = df.iloc[-1]["fault_type"]
 
     print("Saving prediction...")
 
     save_prediction(db, prediction)
 
     print("Prediction saved!")
+
+    # Legacy heuristic values are retained only for compatibility
+    # with the existing non-null database schema.
+    # They are not exposed as ML predictions through the API.
+    prediction.pop("_legacy_failure_probability", None)
+    prediction.pop("_legacy_remaining_useful_life", None)
 
     # Create alert based on health score
     health = prediction["health_score"]

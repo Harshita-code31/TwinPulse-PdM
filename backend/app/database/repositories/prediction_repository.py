@@ -11,11 +11,11 @@ def save_prediction(db: Session, prediction: dict):
 
         health_score=prediction["health_score"],
 
-        failure_probability=prediction["failure_probability"],
+        failure_probability=prediction["_legacy_failure_probability"],
 
-        remaining_useful_life=prediction["remaining_useful_life"],
+        remaining_useful_life=prediction["_legacy_remaining_useful_life"],
 
-        predicted_fault=prediction["predicted_fault"]
+        predicted_fault=prediction["simulation_fault"]
 
     )
 

@@ -3,6 +3,8 @@ from fastapi import FastAPI
 from app.api.machine import router as machine_router
 from app.config.settings import get_settings
 from app.database.db import initialize_database
+from app.database.db import create_session_factory
+from app.database.seed import ensure_default_machines
 from app.api.sensor import router as sensor_router
 from app.api.prediction import router as prediction_router
 from app.api.health import router as health_router
@@ -24,6 +26,15 @@ def create_application() -> FastAPI:
 
     # Initialize database
     initialize_database()
+
+    # Ensure required digital-twin machines exist
+    SessionFactory = create_session_factory()
+    db = SessionFactory()
+
+    try:
+        ensure_default_machines(db)
+    finally:
+        db.close()
 
     # Register API routers
     app.include_router(machine_router)

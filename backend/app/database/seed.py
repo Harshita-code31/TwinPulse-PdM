@@ -88,7 +88,41 @@ def seed_database(db: Session):
     print("Database seeded successfully.")
 
     from app.database.db import create_session_factory
+def ensure_default_machines(db: Session):
+    """
+    Create default demo machines only if they do not already exist.
+    Does not delete existing telemetry or predictions.
+    """
 
+    default_machines = [
+        (1, "Gearbox-1", "Gearbox"),
+        (2, "Pump-1", "Pump"),
+        (3, "Compressor-1", "Compressor"),
+        (4, "Motor-1", "Motor"),
+        (5, "Conveyor-1", "Conveyor"),
+    ]
+
+    for machine_id, machine_name, machine_type in default_machines:
+
+        existing_machine = (
+            db.query(Machine)
+            .filter(Machine.machine_id == machine_id)
+            .first()
+        )
+
+        if existing_machine is None:
+            db.add(
+                Machine(
+                    machine_id=machine_id,
+                    machine_name=machine_name,
+                    machine_type=machine_type,
+                    location="Demo Plant",
+                    installation_date=date(2026, 1, 1),
+                    status="Running",
+                )
+            )
+
+    db.commit()
 if __name__ == "__main__":
 
     SessionFactory = create_session_factory()
