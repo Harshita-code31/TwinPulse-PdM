@@ -450,18 +450,8 @@ Flutter Live Dashboard (MQTT)
 
 ---
 
-# 👨‍💻 Author
+# Maintainer
 
-**Sai Sanjanaa P R**
+**Harshita Gupta** ([Harshita-code31](https://github.com/Harshita-code31))
 
-B.E. Computer Science and Engineering (Internet of Things)
-
-Sri Sairam Engineering College
-
-Industrial IoT & AI Predictive Maintenance Internship Project
-
----
-
-## ⭐ Acknowledgement
-
-This project was developed as part of an Industrial IoT & AI internship to demonstrate an end-to-end Predictive Maintenance platform using modern software engineering, machine learning, messaging, and mobile technologies.
+Maintainer of TwinPulse-PdM — Industrial Digital Twin & Predictive Maintenance.
