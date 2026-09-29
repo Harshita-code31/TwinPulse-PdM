@@ -450,8 +450,8 @@ Flutter Live Dashboard (MQTT)
 
 ---
 
-# Maintainer
+# Repository Owner
 
 **Harshita Gupta** ([Harshita-code31](https://github.com/Harshita-code31))
 
-Maintainer of TwinPulse-PdM — Industrial Digital Twin & Predictive Maintenance.
+Repository owner and maintainer of TwinPulse-PdM — Industrial Digital Twin & Predictive Maintenance.
